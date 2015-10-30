@@ -2,4 +2,5 @@
     <string name="app_name">OMG_Android</string>
     <string name="action_settings">Settings</string>
     <string name="textview">Antony is learning Android!</string>
+    <string name="button">Update the TextView</string>
 </resources>
