@@ -1,9 +1,12 @@
 package com.meshway.www.omg_android;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -26,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ListView mainListView;
     ArrayAdapter mArrayAdapter;
     ArrayList mNameList = new ArrayList<>();
+    ShareActionProvider mShareActionProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +67,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        MenuItem shareItem = menu.findItem(R.id.menu_item_share);
+
+        if(null != shareItem) {
+
+            mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
+        }
+
+        setShareIntent();
         return true;
+    }
+
+    private void setShareIntent() {
+        if(null != mShareActionProvider) {
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("text/plain");
+            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Android Development");
+            shareIntent.putExtra(Intent.EXTRA_TEXT, mainTextView.getText());
+
+            mShareActionProvider.setShareIntent(shareIntent);
+        }
     }
 
     @Override
@@ -71,6 +95,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mainTextView.setText(mainEditText.getText().toString() + " is learning Android development");
         mNameList.add(mainEditText.getText().toString());
         mArrayAdapter.notifyDataSetChanged();
+
+        setShareIntent();
     }
 
     @Override
