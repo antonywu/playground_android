@@ -1,6 +1,9 @@
 package com.meshway.www.omg_android;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -18,6 +21,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -30,6 +34,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ArrayAdapter mArrayAdapter;
     ArrayList mNameList = new ArrayList<>();
     ShareActionProvider mShareActionProvider;
+    private static final String PREFS = "prefs";
+    private static final String PREF_NAME = "name";
+    SharedPreferences msharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +68,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mNameList);
         mainListView.setAdapter(mArrayAdapter);
         mainListView.setOnItemClickListener(this);
+
+        displayWelcome();
     }
 
     @Override
@@ -87,6 +96,46 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             shareIntent.putExtra(Intent.EXTRA_TEXT, mainTextView.getText());
 
             mShareActionProvider.setShareIntent(shareIntent);
+        }
+    }
+
+    public void displayWelcome() {
+        msharedPreferences = getSharedPreferences(PREFS, MODE_PRIVATE);
+
+        String name = msharedPreferences.getString(PREF_NAME, "");
+
+        if(name.length() > 0) {
+            Toast.makeText(this, "Welcome back, " + name + "!", Toast.LENGTH_LONG).show();
+        } else {
+            AlertDialog.Builder alert = new AlertDialog.Builder(this);
+            alert.setTitle("Hello!");
+            alert.setMessage("What is your name?");
+
+            final EditText input = new EditText(this);
+            alert.setView(input);
+
+            alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    String inputName = input.getText().toString();
+
+                    SharedPreferences.Editor e = msharedPreferences.edit();
+                    e.putString(PREF_NAME, inputName);
+                    e.commit();
+
+
+                    Toast.makeText(getApplicationContext(), "Welcome, " + inputName + "!", Toast.LENGTH_LONG).show();
+
+                }
+            });
+
+            alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                }
+            });
+
+            alert.show();
         }
     }
 
