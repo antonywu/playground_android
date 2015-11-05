@@ -172,6 +172,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         //Log.d("omg android", position + ": " + mNameList.get(position));
+        JSONObject jsonObject = (JSONObject) mJSONAdapter.getItem(position);
+        String coverID = jsonObject.optString("cover_i", "");
+
+        Intent detailIntent = new Intent(this, DetailActivity.class);
+
+        detailIntent.putExtra("coverID", coverID);
+
+        startActivity(detailIntent);
     }
 
     private void queryBooks(String searchString) {
