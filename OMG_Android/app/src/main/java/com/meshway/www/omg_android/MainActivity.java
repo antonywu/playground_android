@@ -1,6 +1,7 @@
 package com.meshway.www.omg_android;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final String PREFS = "prefs";
     private static final String PREF_NAME = "name";
     private static final String QUERY_URL = "http://openlibrary.org/search.json?q=";
+    ProgressDialog mDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +83,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mainListView.setAdapter(mJSONAdapter);
 
         mainListView.setOnItemClickListener(this);
+
+        mDialog = new ProgressDialog(this);
+        mDialog.setMessage("Searching for Book");
+        mDialog.setCancelable(false);
 
         displayWelcome();
     }
@@ -179,11 +185,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         AsyncHttpClient client = new AsyncHttpClient();
+        mDialog.show();
 
         client.get(QUERY_URL + urlString,
                 new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject jsonObject) {
+                        mDialog.dismiss();
                         Toast.makeText(getApplicationContext(), "Success!", Toast.LENGTH_LONG).show();
                         //Log.d("omg android", jsonObject.toString());
                         mJSONAdapter.updateData(jsonObject.optJSONArray(("docs")));
@@ -191,6 +199,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                     @Override
                     public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject error) {
+                        mDialog.dismiss();
                         Toast.makeText(getApplicationContext(), "Error: " + statusCode + " " + throwable.getMessage(),
                                 Toast.LENGTH_LONG).show();
                         Log.e("omg android", statusCode + " " + throwable.getMessage());
